@@ -1,0 +1,30 @@
+version: 1
+backend:
+  phases:
+    preBuild:
+      commands:
+        - corepack enable
+        - corepack prepare pnpm@10.16.1 --activate
+        - pnpm install --frozen-lockfile
+    build:
+      commands:
+        - npm install -g @aws-amplify/backend-cli --force
+        - npx ampx pipeline-deploy --branch $AWS_BRANCH --app-id $AWS_APP_ID
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - corepack enable
+        - corepack prepare pnpm@10.16.1 --activate
+        - pnpm install --frozen-lockfile
+    build:
+      commands:
+        - NODE_OPTIONS=--max-old-space-size=49152 pnpm exec vite build
+  artifacts:
+    baseDirectory: dist
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
+      - .pnpm-store/**/*
